@@ -1,0 +1,36 @@
+/* Кастомные стили поверх Bootstrap */
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.container {
+    flex: 1;
+}
+
+.card {
+    border: none;
+    border-radius: 10px;
+}
+
+.habit-card {
+    transition: transform 0.2s;
+}
+
+.habit-card:hover {
+    transform: translateY(-3px);
+}
+
+/* Кастомные цвета для алертов */
+.alert-danger {
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+    color: #721c24;
+}
+
+.alert-success {
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+    color: #155724;
+}
