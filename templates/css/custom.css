@@ -1,4 +1,3 @@
-/* Кастомные стили поверх Bootstrap */
 body {
     min-height: 100vh;
     display: flex;
@@ -22,7 +21,6 @@ body {
     transform: translateY(-3px);
 }
 
-/* Кастомные цвета для алертов */
 .alert-danger {
     background-color: #f8d7da;
     border-color: #f5c6cb;
