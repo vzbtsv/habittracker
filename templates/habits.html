@@ -14,16 +14,30 @@
                                 <th>Название</th>
                                 <th>Описание</th>
                                 <th>Дни недели</th>
+                                <th>Прогресс (за неделю)</th>
                                 <th>Действия</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for habit in habits %}
+                                {% set _ = reset_weekly_progress(habit) %}
                                 <tr>
                                     <td>{{ habit.name }}</td>
                                     <td>{{ habit.description }}</td>
                                     <td>{{ habit.days_of_week }}</td>
+                                    <td>{{ habit.completion_count }}</td>
                                     <td>
+                                        {% if habit.is_done %}
+                                            <button disabled class="btn btn-success btn-sm mb-1">Выполнено</button><br/>
+                                            <form action="{{ url_for('skip_habit', habit_id=habit.id) }}" method="post" style="display:inline;">
+                                                <button type="submit" class="btn btn-secondary btn-sm">Пропустить</button>
+                                            </form>
+                                        {% else %}
+                                            <form action="{{ url_for('mark_done', habit_id=habit.id) }}" method="post" style="display:inline;">
+                                                <button type="submit" class="btn btn-success btn-sm">Выполнено</button>
+                                            </form>
+                                        {% endif %}
+
                                         <form action="{{ url_for('delete_habit', habit_id=habit.id) }}" method="post" style="display:inline;">
                                             <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Вы уверены, что хотите удалить эту привычку?');">Удалить</button>
                                         </form>
@@ -42,4 +56,5 @@
         </div>
     </div>
 </div>
+
 {% endblock %}

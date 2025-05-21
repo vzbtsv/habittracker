@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, url_for, flash
+from flask import Flask, render_template, redirect, url_for, flash, session
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from data.db_session import global_init, create_session
 from forms.login_form import LoginForm
@@ -7,6 +7,8 @@ from forms.add_habit_form import AddHabitForm
 import os
 from data.user import User
 from data.habit import Habit
+from functs import reset_weekly_progress
+from datetime import date
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceumsecretkey'
@@ -23,7 +25,7 @@ login_manager.login_view = 'login'
 def load_user(user_id):
     from data.user import User
     session = create_session()
-    user = session.query(User).get(int(user_id))
+    user = session.get(User, user_id)
     session.close()
     return user
 
@@ -100,7 +102,7 @@ def habits():
             for day in days_of_week_list])
         habit.days_of_week = days_of_week_str
 
-    return render_template('habits.html', habits=habits)
+    return render_template('habits.html', habits=habits, reset_weekly_progress=reset_weekly_progress)
 
 
 @app.route('/add_habit', methods=['GET', 'POST'])
@@ -137,6 +139,31 @@ def delete_habit(habit_id):
         flash('Привычка удалена.', 'success')
     else:
         flash('Ошибка. Привычка не удалена.', 'danger')
+    session.close()
+    return redirect(url_for('habits'))
+
+
+
+@app.route('/habit/<int:habit_id>/done', methods=['POST'])
+def mark_done(habit_id):
+    session = create_session()
+    habit = Habit.query.get_or_404(habit_id)
+    habit.completion_count = (habit.completion_count or 0) + 1
+    today = date.today()
+    if habit.last_reset_date != today:
+        habit.last_reset_date = today
+    session.commit()
+    session.close()
+    return redirect(url_for('habits'))
+
+
+@app.route('/habit/<int:habit_id>/skip', methods=['POST'])
+def skip_habit(habit_id):
+    session = create_session()
+    habit = Habit.query.get_or_404(habit_id)
+    habit.completion_count = 0
+    habit.last_reset_date = date.today()
+    session.commit()
     session.close()
     return redirect(url_for('habits'))
 
